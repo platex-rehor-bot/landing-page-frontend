@@ -10,7 +10,10 @@ test.describe('Explore Capabilities widget', () => {
     await landing.gotoAndWaitForLayout();
   });
 
-  test('shows correct content and CTAs for each tile', async ({ page }) => {
+  // Skip: widget-layout federated module intermittently fails to load in CI
+  // (net::ERR_TOO_MANY_RETRIES / 503 on fed-mods.json). Same failure on master.
+  // Follow-up: RHCLOUD-49783
+  test.skip('shows correct content and CTAs for each tile', async ({ page }) => {
     const landing = new LandingPage(page);
     const widget = landing.widget('exploreCapabilities-widget');
     await expect(widget).toBeVisible();
