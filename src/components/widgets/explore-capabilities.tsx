@@ -67,32 +67,30 @@ const ExploreCapabilities: React.FunctionComponent = () => {
   ];
 
   const cardContent = cardData.map((cardData) => (
-    <>
-      <div key={cardData.id} className="pf-v6-u-m-0">
-        <Link to={cardData.url}>
-          <Card ouiaId={cardData.ouiaId} isFullHeight>
-            <CardBody className="pf-v6-u-p-md pf-v6-u-text-align-center land-c-card__body-explore">
-              <img
-                className="pf-v6-u-justify-content-center"
-                src={cardData.img}
-                alt={cardData.alt}
-              />
-              <Content>
-                <Content
-                  component="p"
-                  className="pf-v6-u-mb-0 pf-v6-u-font-size-sm"
-                >
-                  {cardData.title}
-                </Content>
-                <Content component="small" className="pf-v6-u-font-size-xs">
-                  {cardData.body}
-                </Content>
+    <div key={cardData.id} className="pf-v6-u-m-0">
+      <Link to={cardData.url}>
+        <Card ouiaId={cardData.ouiaId} isFullHeight>
+          <CardBody className="pf-v6-u-p-md pf-v6-u-text-align-center land-c-card__body-explore">
+            <img
+              className="pf-v6-u-justify-content-center"
+              src={cardData.img}
+              alt={cardData.alt}
+            />
+            <Content>
+              <Content
+                component="p"
+                className="pf-v6-u-mb-0 pf-v6-u-font-size-sm"
+              >
+                {cardData.title}
               </Content>
-            </CardBody>
-          </Card>
-        </Link>
-      </div>
-    </>
+              <Content component="small" className="pf-v6-u-font-size-xs">
+                {cardData.body}
+              </Content>
+            </Content>
+          </CardBody>
+        </Card>
+      </Link>
+    </div>
   ));
 
   return (
