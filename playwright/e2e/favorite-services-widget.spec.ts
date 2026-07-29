@@ -1,26 +1,26 @@
-import { type Locator, type Page, expect, test } from '@playwright/test';
-import { LandingPage } from '../pages/LandingPage';
+import { type Locator, type Page, expect, test } from "@playwright/test";
+import { LandingPage } from "../pages/LandingPage";
 
-test.describe('My Favorite Services widget', () => {
-  const widgetId = 'favoriteServices-widget';
+test.describe("My Favorite Services widget", () => {
+  const widgetId = "favoriteServices-widget";
 
   async function openServicesMenu(page: Page): Promise<Locator> {
     // This button toggles the All Services sidebar/dropdown in chrome.
-    const toggle = page.getByRole('button', {
+    const toggle = page.getByRole("button", {
       name: /Red Hat Hybrid Cloud Console/i,
     });
     await expect(toggle).toBeVisible({ timeout: 60000 });
     await toggle.click();
 
     const sidebarRoot = page
-      .locator('.pf-v6-c-sidebar, .pf-v5-c-sidebar')
+      .locator(".pf-v6-c-sidebar, .pf-v5-c-sidebar")
       .first();
     await expect(sidebarRoot).toBeVisible({ timeout: 60000 });
     return sidebarRoot;
   }
 
   async function closeServicesMenu(page: Page): Promise<void> {
-    const toggle = page.getByRole('button', {
+    const toggle = page.getByRole("button", {
       name: /Red Hat Hybrid Cloud Console/i,
     });
     await toggle.click().catch(() => undefined);
@@ -32,9 +32,9 @@ test.describe('My Favorite Services widget', () => {
     // Different chrome variants render this in a left-nav, a tablist, or as a link/button.
     // We search the entire services menu container (not just the content panel).
     const candidates = [
-      sidebar.getByRole('tab', { name: /^Automation$/i }),
-      sidebar.getByRole('button', { name: /^Automation$/i }),
-      sidebar.getByRole('link', { name: /^Automation$/i }),
+      sidebar.getByRole("tab", { name: /^Automation$/i }),
+      sidebar.getByRole("button", { name: /^Automation$/i }),
+      sidebar.getByRole("link", { name: /^Automation$/i }),
       sidebar.getByText(/^Automation$/i),
       sidebar.getByText(/automation/i),
     ];
@@ -64,11 +64,11 @@ test.describe('My Favorite Services widget', () => {
     await clickAutomationCategoryIfPresent(sidebar);
 
     const sidebarContent = sidebar
-      .locator('.pf-v6-c-sidebar__content, .pf-v5-c-sidebar__content')
+      .locator(".pf-v6-c-sidebar__content, .pf-v5-c-sidebar__content")
       .first();
 
     const tasksLink = sidebarContent
-      .getByRole('link', { name: /^Tasks$/ })
+      .getByRole("link", { name: /^Tasks$/ })
       .or(sidebarContent.locator('a[href*="/insights/tasks"]'))
       .first();
     await expect(tasksLink).toBeVisible({ timeout: 60000 });
@@ -76,11 +76,11 @@ test.describe('My Favorite Services widget', () => {
 
     // In the topbar services dropdown, each service is rendered as a tile/link that contains
     // a `.chr-c-favorite-trigger` container and a `...-FavoriteToggle` plain button.
-    const trigger = tasksLink.locator('.chr-c-favorite-trigger').first();
+    const trigger = tasksLink.locator(".chr-c-favorite-trigger").first();
     await expect(trigger).toBeVisible({ timeout: 60000 });
 
     const isFavorited = async () =>
-      (await trigger.getAttribute('class'))?.includes('chr-c-icon-favorited') ??
+      (await trigger.getAttribute("class"))?.includes("chr-c-icon-favorited") ??
       false;
 
     const before = await isFavorited();
@@ -111,8 +111,8 @@ test.describe('My Favorite Services widget', () => {
           const url = resp.url();
           const method = resp.request().method();
           return (
-            url.includes('/api/chrome-service/v1/favorite-pages') &&
-            (method === 'POST' || method === 'DELETE') &&
+            url.includes("/api/chrome-service/v1/favorite-pages") &&
+            (method === "POST" || method === "DELETE") &&
             resp.status() >= 200 &&
             resp.status() < 400
           );
@@ -131,10 +131,12 @@ test.describe('My Favorite Services widget', () => {
     await page.setViewportSize({ width: 1280, height: 2000 });
   });
 
-  // Skip: widget-layout federated module intermittently fails to load in CI
-  // (net::ERR_TOO_MANY_RETRIES / 503 on fed-mods.json). Same failure on master.
-  // Follow-up: RHCLOUD-49783
-  test.skip('appears in the default layout', async ({ page }) => {
+  test("appears in the default layout", async ({ page }) => {
+    // RHCLOUD-49783: widget-layout 503s intermittently in CI — skip there, run locally
+    test.skip(
+      !!process.env.CI,
+      "widget-layout federated module 503s in CI (RHCLOUD-49783)",
+    );
     const landing = new LandingPage(page);
     await landing.stubFavoritePages([]);
     await landing.gotoAndWaitForLayout();
@@ -143,7 +145,7 @@ test.describe('My Favorite Services widget', () => {
     await expect(landing.widget(widgetId)).toBeVisible();
   });
 
-  test('disappears when removed from the layout', async ({ page }) => {
+  test("disappears when removed from the layout", async ({ page }) => {
     const landing = new LandingPage(page);
     await landing.stubFavoritePages([]);
     await landing.gotoAndWaitForLayout();
@@ -152,14 +154,14 @@ test.describe('My Favorite Services widget', () => {
     await landing.removeWidget(widgetId);
   });
 
-  test('shows empty state when no favorites are set', async ({ page }) => {
+  test("shows empty state when no favorites are set", async ({ page }) => {
     const landing = new LandingPage(page);
     await landing.stubFavoritePages([]);
 
     const favoritesResp = page.waitForResponse((resp) => {
       return (
-        resp.request().method() === 'GET' &&
-        resp.url().includes('/api/chrome-service/v1/user') &&
+        resp.request().method() === "GET" &&
+        resp.url().includes("/api/chrome-service/v1/user") &&
         resp.status() >= 200 &&
         resp.status() < 400
       );
@@ -171,11 +173,11 @@ test.describe('My Favorite Services widget', () => {
 
     await expect(landing.widget(widgetId)).toBeVisible();
     await expect(
-      landing.widget(widgetId).getByRole('heading', { level: 3 }),
+      landing.widget(widgetId).getByRole("heading", { level: 3 }),
     ).toContainText(/no favorited services/i);
   });
 
-  test('shows favorites when they are set', async ({ page }) => {
+  test("shows favorites when they are set", async ({ page }) => {
     const landing = new LandingPage(page);
     test.setTimeout(90000);
 

@@ -1,7 +1,7 @@
-import { expect, test } from '@playwright/test';
-import { LandingPage } from '../pages/LandingPage';
+import { expect, test } from "@playwright/test";
+import { LandingPage } from "../pages/LandingPage";
 
-test.describe('Explore Capabilities widget', () => {
+test.describe("Explore Capabilities widget", () => {
   test.describe.configure({ timeout: 90000 });
 
   test.beforeEach(async ({ page }) => {
@@ -10,55 +10,53 @@ test.describe('Explore Capabilities widget', () => {
     await landing.gotoAndWaitForLayout();
   });
 
-  // Skip: widget-layout federated module intermittently fails to load in CI
-  // (net::ERR_TOO_MANY_RETRIES / 503 on fed-mods.json). Same failure on master.
-  // Follow-up: RHCLOUD-49783
-  test.skip('shows correct content and CTAs for each tile', async ({ page }) => {
+  test("shows correct content and CTAs for each tile", async ({ page }) => {
+    // RHCLOUD-49783: widget-layout 503s intermittently in CI — skip there, run locally
+    test.skip(
+      !!process.env.CI,
+      "widget-layout federated module 503s in CI (RHCLOUD-49783)",
+    );
     const landing = new LandingPage(page);
-    const widget = landing.widget('exploreCapabilities-widget');
+    const widget = landing.widget("exploreCapabilities-widget");
     await expect(widget).toBeVisible();
 
     const tileData = [
       {
-        ouiaId: 'start-guided-tour-button',
-        title: 'Get started with a tour',
+        ouiaId: "start-guided-tour-button",
+        title: "Get started with a tour",
         expectedHref: /\/?$/,
       },
       {
-        ouiaId: 'try-rosa-button',
-        title: 'Try OpenShift on AWS',
+        ouiaId: "try-rosa-button",
+        title: "Try OpenShift on AWS",
         expectedHref: /\/openshift\/overview\/rosa/,
       },
       {
-        ouiaId: 'explore-sandbox-button',
-        title: 'Try our products in the Developer Sandbox',
+        ouiaId: "explore-sandbox-button",
+        title: "Try our products in the Developer Sandbox",
         expectedHref: /https:\/\/sandbox\.redhat\.com/,
       },
       {
-        ouiaId: 'analyze-risk-button',
-        title: 'Analyze RHEL environments',
+        ouiaId: "analyze-risk-button",
+        title: "Analyze RHEL environments",
         expectedHref: /\/insights\/dashboard/,
       },
       {
-        ouiaId: 'cent-os-button',
-        title: 'Convert from CentOS to RHEL',
+        ouiaId: "cent-os-button",
+        title: "Convert from CentOS to RHEL",
         expectedHref: /\/insights\/tasks\/available\/convert-to-rhel-analysis/,
       },
     ] as const;
 
     for (const item of tileData) {
-      const tile = widget.locator(
-        `[data-ouia-component-id="${item.ouiaId}"]`,
-      );
+      const tile = widget.locator(`[data-ouia-component-id="${item.ouiaId}"]`);
       await expect(tile).toBeVisible();
       await expect(tile).toContainText(item.title);
 
       // The link wraps the PF Card, so the <a> is an ancestor of the card element.
-      const cta = tile.locator('xpath=ancestor::a[1]');
+      const cta = tile.locator("xpath=ancestor::a[1]");
       await expect(cta).toBeVisible();
-      await expect(cta).toHaveAttribute('href', item.expectedHref);
+      await expect(cta).toHaveAttribute("href", item.expectedHref);
     }
   });
 });
-
-
